@@ -104,19 +104,21 @@ def clean_data(csv_file, date_name='Date'):
 # Extract data needed for analysis
 
 # BOE Interest rate data
-interest_rate_df = clean_data(r'..\01_Data\int_rate.csv', 'Date Changed')
+interest_rate_df = clean_data(r'data/int_rate.csv', 'Date Changed')
 
-# Individual sales data - Core dataset 
-individual_house_prices_df = clean_data(r'..\01_Data\price_paid_records.csv', 'Date of Transfer')
+# Individual sales data - Post cleaning dataset. 
+# I couldn't upload the full land registry dataset due to file size constraints in github so had to shorten it down to only
+# Somerset County sales
+individual_house_prices_df = clean_data(r'data/clean_prices_paid.csv', 'Date of Transfer')
 
 # Unemployment Data
-unemployment_df = clean_data(r'..\01_Data\unemployment.csv')
+unemployment_df = clean_data(r'data/unemployment.csv')
 
 # Unemployment Data
-gdp_df = clean_data(r'..\01_Data\gdp_data.csv')
+gdp_df = clean_data(r'data/gdp_data.csv')
 
 # NewBuilds Data
-new_build_df = clean_data(r'..\01_Data\NewBuilds.csv')
+new_build_df = clean_data(r'data/NewBuilds.csv')
 
 
 # In[4]:
@@ -370,18 +372,13 @@ def thorough_clean_ihp(df,county='SOMERSET', drop_cols=None):
     Outputs
     cleaned_df - A clean and filtered dataframe based on county and dropped columns'''
     
-    cleaned_df=df[(df['Record Status - monthly file only']=='A')&
-          (df['Price']<5e5)&                           # Avg first time buyer < £500K
-         (df['Property Type']!='O')&                   # Other type doesn't initially seem useful as I don't have sales data to match this
-         (df['County']==county)]                       # Set as Somerset as default
+    cleaned_df=df[(df['Price']<5e5)&                           # Avg first time buyer < £500K
+                 (df['Property Type']!='O')&                   # Other type doesn't initially seem useful as I don't have sales data to match this
+                 (df['County']==county)]                       # Set as Somerset as default
     cleaned_df = cleaned_df.drop(drop_cols, axis=1)
     return cleaned_df
 
-clean_ihp_df = thorough_clean_ihp(individual_house_prices_df, 'SOMERSET', ['Transaction unique identifier',
-                                                                          'PPDCategory Type',
-                                                                          'Record Status - monthly file only',
-                                                                           'District',
-                                                              ])
+clean_ihp_df = thorough_clean_ihp(individual_house_prices_df, 'SOMERSET', ['Index'])
 
 
 # In[19]:
